@@ -1,13 +1,13 @@
-name: Deploy Backend
+name: Deploy React App
 
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to the main branch
+      - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+    runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout the repository
@@ -18,20 +18,23 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Specify the Node.js version
+          node-version: 18
 
-      # Step 3: Install dependencies
+      # Step 3: Navigate to the client directory
+      - name: Navigate to client directory
+        run: cd client
+
+      # Step 4: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Run tests (optional)
-      - name: Run tests
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}  # Use the GitHub Secret
-        run: npm test
+      # Step 5: Build the React app
+      - name: Build project
+        run: npm run build
 
-      # Step 5: Deploy the application
-      - name: Deploy to server
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}  # Use the GitHub Secret
-        run: npm run deploy
+      # Step 6: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./client/build
