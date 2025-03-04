@@ -20,19 +20,17 @@ jobs:
         with:
           node-version: 18
 
-      # Step 3: Navigate to the client directory
-      - name: Navigate to client directory
-        run: cd client
-
-      # Step 4: Install dependencies
+      # Step 3: Install dependencies in the client directory
       - name: Install dependencies
+        working-directory: ./client
         run: npm install
 
-      # Step 5: Build the React app
+      # Step 4: Build the React app in the client directory
       - name: Build project
+        working-directory: ./client
         run: npm run build
 
-      # Step 6: Deploy to GitHub Pages
+      # Step 5: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
