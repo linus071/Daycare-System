@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Daycare-System/static/css/main.e6c13ad2.css",
+    "main.js": "/Daycare-System/static/js/main.fdc6877a.js",
+    "static/js/453.419a5d54.chunk.js": "/Daycare-System/static/js/453.419a5d54.chunk.js",
+    "index.html": "/Daycare-System/index.html",
+    "main.e6c13ad2.css.map": "/Daycare-System/static/css/main.e6c13ad2.css.map",
+    "main.fdc6877a.js.map": "/Daycare-System/static/js/main.fdc6877a.js.map",
+    "453.419a5d54.chunk.js.map": "/Daycare-System/static/js/453.419a5d54.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.fdc6877a.js"
+  ]
+}
