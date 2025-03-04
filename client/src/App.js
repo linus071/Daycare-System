@@ -1,18 +1,35 @@
 import React, { useState } from 'react';
-import Login from './Login';
-import PunchInOut from './PunchInOut';
+import CheckInOut from './CheckInOut';
+import Admin from './Admin';
+import './App.css';
 
 const App = () => {
-  const [userId, setUserId] = useState(null);
+  const [showAdmin, setShowAdmin] = useState(false); // Track whether to show the admin page
 
-  const handleLogin = (name, password) => {
-    // Authenticate user (you can add this logic later)
-    setUserId('someUserId'); // Replace with actual user ID from DB
+  const handleAdminClick = () => {
+    setShowAdmin(true); // Show the admin page
+  };
+
+  const handleBackToHome = () => {
+    setShowAdmin(false); // Go back to the CheckInOut page
   };
 
   return (
     <div>
-      {!userId ? <Login onLogin={handleLogin} /> : <PunchInOut userId={userId} />}
+      {/* Show the CheckInOut page by default */}
+      {!showAdmin && (
+        <div>
+          <CheckInOut />
+          <button onClick={handleAdminClick}>Admin</button>
+        </div>
+      )}
+
+      {/* Show the Admin page when showAdmin is true */}
+      {showAdmin && (
+        <div>
+          <Admin onBack={handleBackToHome} />
+        </div>
+      )}
     </div>
   );
 };
