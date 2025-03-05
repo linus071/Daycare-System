@@ -1,0 +1,53 @@
+{
+    "name": "daycare-system",
+    "version": "1.0.0",
+    "description": "A desktop application for managing daycare systems.",
+    "author": "Your Name <your.email@example.com>",
+    "main": "electron/main.js",
+    "scripts": {
+        "start": "concurrently \"npm run start-react\" \"npm run start-electron\"",
+        "start-react": "cd client && npm start",
+        "start-electron": "electron .",
+        "build": "cd client && npm run build && cd .. && npm run package",
+        "package": "electron-builder"
+    },
+    "devDependencies": {
+      "electron": "^28.0.0",
+      "concurrently": "^8.2.2",
+      "electron-builder": "^24.0.0"
+    },
+    "build": {
+        "appId": "com.yourcompany.daycare-system",
+        "productName": "Daycare System",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "client/build/**/*",
+            "server/**/*",
+            "electron/main.js",
+            "package.json"
+        ],
+        "extraResources": [
+            {
+            "from": "server",
+            "to": "server"
+            }
+        ],
+        "nodeGypRebuild": false,
+        "npmRebuild": false,
+        "asar": true,
+        "win": {
+            "target": "nsis",
+            "icon": "assets/icon.ico"
+        },
+        "mac": {
+            "target": "dmg",
+            "icon": "assets/icon.icns"
+        },
+        "linux": {
+            "target": "AppImage",
+            "icon": "assets/icon.png"
+        }
+    }
+}
