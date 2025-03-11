@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth.js'); // Assuming your routes are in a file called auth.js
+const payrollRoutes = require('./routes/payroll.js'); 
 require('dotenv').config();
 
 const app = express();
@@ -29,7 +30,9 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Routes
 console.log('Setting up routes...');
-app.use('/api', authRoutes); // Use your routes
+// Use your routes
+app.use('/api', authRoutes); 
+app.use('/api', payrollRoutes); 
 
 // Start the server
 app.listen(PORT, () => {

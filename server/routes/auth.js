@@ -15,7 +15,7 @@ router.get('/users', async (req, res) => {
 
 // Add a new user (Admin only)
 router.post('/users', async (req, res) => {
-  const { name, password } = req.body;
+  const { name, password, hourlyRate, atoBalance, travelPay, closePay, babyPay } = req.body;
 
   try {
     // Check if the user already exists
@@ -24,8 +24,17 @@ router.post('/users', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create a new user
-    const user = new User({ name, password });
+    // Create a new user with all required fields
+    const user = new User({
+      name,
+      password,
+      hourlyRate,
+      atoBalance,
+      travelPay,
+      closePay,
+      babyPay,
+    });
+
     await user.save();
 
     res.status(201).json({ message: 'User created successfully', user });
@@ -36,11 +45,11 @@ router.post('/users', async (req, res) => {
 
 // Check In/Out
 router.post('/check', async (req, res) => {
-  const { userId, password } = req.body;
+  const { userName, password } = req.body; // Use userName instead of userId
 
   try {
-    // Find the user by ID
-    const user = await User.findById(userId);
+    // Find the user by name
+    const user = await User.findOne({ name: userName });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -52,28 +61,43 @@ router.post('/check', async (req, res) => {
 
     if (user.isCheckedIn) {
       // User is checking out
-      const shift = await Shift.findOne({ userId, punchOut: { $exists: false } });
+      const shift = await Shift.findOne({ userId: user._id, punchOut: { $exists: false } });
       if (!shift) {
         return res.status(400).json({ message: 'No active shift found' });
       }
 
       const punchOut = new Date();
       shift.punchOut = punchOut;
-      shift.hoursWorked = (punchOut - shift.punchIn) / (1000 * 60 * 60); // Calculate hours worked
-      await shift.save();
+      const hoursWorked = (punchOut - shift.punchIn) / (1000 * 60 * 60); // Calculate hours worked
+      shift.hoursWorked = hoursWorked;
 
-      user.totalHours += shift.hoursWorked; // Update total hours
-      user.isCheckedIn = false; // Mark user as checked out
+      // Check if hours worked exceed or fall below 7.5 hours
+      if (hoursWorked > 7.5) {
+        shift.additionalTime = hoursWorked - 7.5;
+        shift.atoReason = req.body.atoReason; // Reason for additional time
+        user.atoBalance += shift.additionalTime; // Update ATO balance
+      } else if (hoursWorked < 7.5) {
+        shift.comments = req.body.comments; // Reason for reduced time
+      }
+
+      await shift.save();
+      user.totalHours += hoursWorked;
+      user.isCheckedIn = false;
       await user.save();
 
-      res.status(200).json({ message: 'Checked out successfully', shift, totalHours: user.totalHours });
+      res.status(200).json({
+        message: 'Checked out successfully',
+        shift,
+        totalHours: user.totalHours,
+        atoBalance: user.atoBalance,
+      });
     } else {
       // User is checking in
-      const shift = new Shift({ userId, punchIn: new Date() });
+      const shift = new Shift({ userId: user._id, punchIn: new Date() });
       await shift.save();
 
-      user.shifts.push(shift._id); // Add shift to user's shifts
-      user.isCheckedIn = true; // Mark user as checked in
+      user.shifts.push(shift._id);
+      user.isCheckedIn = true;
       await user.save();
 
       res.status(200).json({ message: 'Checked in successfully', shift });

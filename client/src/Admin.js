@@ -1,51 +1,35 @@
 import React, { useState } from 'react';
+import PayrollReport from './PayrollReport'; // Import the PayrollReport component
+import UpdateAtoBalance from './UpdateAtoBalance'; // Import the UpdateAtoBalance component
 
 const Admin = ({ onBack }) => {
-  const [password, setPassword] = useState(''); // Password for admin access
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track if the user is authenticated
-  const [name, setName] = useState(''); // Name of the new user
-  const [userPassword, setUserPassword] = useState(''); // Password of the new user
-  const [message, setMessage] = useState(''); // Message to display to the user
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeTab, setActiveTab] = useState('addUser'); // Track the active tab
 
-  // Handle admin login
   const handleAuth = (e) => {
     e.preventDefault();
-
-    // Check if the password is correct
     if (password === '1212') {
-      setIsAuthenticated(true); // Grant access
-      setMessage(''); // Clear any previous error messages
+      setIsAuthenticated(true);
     } else {
-      setMessage('Incorrect password'); // Show error message
+      alert('Incorrect password');
     }
   };
 
-  // Handle adding a new user
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      // Send a request to the back end to add a new user
-      const response = await fetch('http://localhost:5000/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password: userPassword }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setMessage(data.message); // Success message
-        setName(''); // Clear the form
-        setUserPassword('');
-      } else {
-        setMessage(data.message || 'An error occurred'); // Error message
-      }
-    } catch (err) {
-      setMessage('An error occurred. Please try again.'); // Handle network errors
+  // Render the appropriate component based on the active tab
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'addUser':
+        return <AddUser />;
+      case 'payrollReport':
+        return <PayrollReport />;
+      case 'updateAtoBalance':
+        return <UpdateAtoBalance />;
+      default:
+        return <AddUser />;
     }
   };
 
-  // If the user is not authenticated, show the login form
   if (!isAuthenticated) {
     return (
       <div>
@@ -63,16 +47,55 @@ const Admin = ({ onBack }) => {
           <br />
           <button type="submit">Login</button>
         </form>
-        {message && <p>{message}</p>}
         <button onClick={onBack}>Back to Home</button>
       </div>
     );
   }
 
-  // If the user is authenticated, show the admin page
   return (
     <div>
-      <h1>Admin Page - Add User</h1>
+      <h1>Admin Panel</h1>
+      <div>
+        <button onClick={() => setActiveTab('addUser')}>Add User</button>
+        <button onClick={() => setActiveTab('payrollReport')}>Generate Payroll Report</button>
+        <button onClick={() => setActiveTab('updateAtoBalance')}>Update ATO Balance</button>
+      </div>
+      {renderActiveTab()}
+      <button onClick={onBack}>Back to Home</button>
+    </div>
+  );
+};
+
+// AddUser component (existing functionality)
+const AddUser = () => {
+  const [name, setName] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password: userPassword }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(data.message);
+        setName('');
+        setUserPassword('');
+      } else {
+        setMessage(data.message || 'An error occurred');
+      }
+    } catch (err) {
+      setMessage('An error occurred. Please try again.');
+    }
+  };
+
+  return (
+    <div>
+      <h2>Add User</h2>
       <form onSubmit={handleSubmit}>
         <label>
           Name:
@@ -97,7 +120,6 @@ const Admin = ({ onBack }) => {
         <button type="submit">Add User</button>
       </form>
       {message && <p>{message}</p>}
-      <button onClick={onBack}>Back to Home</button>
     </div>
   );
 };
