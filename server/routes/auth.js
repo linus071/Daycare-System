@@ -107,10 +107,14 @@ router.post('/check', async (req, res) => {
   }
 });
 
-// Get Shifts for a User
-router.get('/shifts/:userId', async (req, res) => {
-  const shifts = await Shift.find({ userId: req.params.userId });
-  res.status(200).json(shifts);
+// Get shifts for a user
+router.get('/shifts/user/:userId', async (req, res) => {
+  try {
+    const shifts = await Shift.find({ userId: req.params.userId });
+    res.status(200).json(shifts);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 });
 
 module.exports = router;

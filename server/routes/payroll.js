@@ -4,6 +4,45 @@ const Shift = require('../models/Shift');
 const XLSX = require('xlsx');
 const router = express.Router();
 
+// Get a single user by ID
+router.get('/users/:userId', async (req, res) => {
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json(user);
+    } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
+    }
+  });
+
+// Update user details
+router.put('/users/:userId', async (req, res) => {
+    const { hourlyRate, atoBalance, travelPay, closePay, babyPay } = req.body;
+  
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Update user fields
+      user.hourlyRate = hourlyRate;
+      user.atoBalance = atoBalance;
+      user.travelPay = travelPay;
+      user.closePay = closePay;
+      user.babyPay = babyPay;
+  
+      await user.save();
+  
+      res.status(200).json({ message: 'User updated successfully', user });
+    } catch (err) {
+      res.status(500).json({ message: 'Server error', error: err.message });
+    }
+  });
+
+
 // Generate Payroll Report in Excel
 router.post('/generate-excel-report', async (req, res) => {
   const { startDate, endDate } = req.body;

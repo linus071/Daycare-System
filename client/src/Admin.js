@@ -58,7 +58,7 @@ const Admin = ({ onBack }) => {
       <div>
         <button onClick={() => setActiveTab('addUser')}>Add User</button>
         <button onClick={() => setActiveTab('payrollReport')}>Generate Payroll Report</button>
-        <button onClick={() => setActiveTab('updateAtoBalance')}>Update ATO Balance</button>
+        <button onClick={() => setActiveTab('updateAtoBalance')}>Update User Details</button>
       </div>
       {renderActiveTab()}
       <button onClick={onBack}>Back to Home</button>
@@ -66,10 +66,15 @@ const Admin = ({ onBack }) => {
   );
 };
 
-// AddUser component (existing functionality)
+// AddUser component (updated)
 const AddUser = () => {
   const [name, setName] = useState('');
   const [userPassword, setUserPassword] = useState('');
+  const [hourlyRate, setHourlyRate] = useState(0); // New field
+  const [atoBalance, setAtoBalance] = useState(0); // New field
+  const [travelPay, setTravelPay] = useState(0); // New field
+  const [closePay, setClosePay] = useState(0); // New field
+  const [babyPay, setBabyPay] = useState(0); // New field
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
@@ -78,13 +83,26 @@ const AddUser = () => {
       const response = await fetch('http://localhost:5000/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password: userPassword }),
+        body: JSON.stringify({
+          name,
+          password: userPassword,
+          hourlyRate: Number(hourlyRate), // Convert to number
+          atoBalance: Number(atoBalance),
+          travelPay: Number(travelPay),
+          closePay: Number(closePay),
+          babyPay: Number(babyPay),
+        }),
       });
       const data = await response.json();
       if (response.ok) {
         setMessage(data.message);
         setName('');
         setUserPassword('');
+        setHourlyRate(0);
+        setAtoBalance(0);
+        setTravelPay(0);
+        setClosePay(0);
+        setBabyPay(0);
       } else {
         setMessage(data.message || 'An error occurred');
       }
@@ -113,6 +131,56 @@ const AddUser = () => {
             type="password"
             value={userPassword}
             onChange={(e) => setUserPassword(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          Hourly Rate:
+          <input
+            type="number"
+            value={hourlyRate}
+            onChange={(e) => setHourlyRate(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          ATO Balance:
+          <input
+            type="number"
+            value={atoBalance}
+            onChange={(e) => setAtoBalance(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          Travel Pay:
+          <input
+            type="number"
+            value={travelPay}
+            onChange={(e) => setTravelPay(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          Close Pay:
+          <input
+            type="number"
+            value={closePay}
+            onChange={(e) => setClosePay(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          Baby Pay:
+          <input
+            type="number"
+            value={babyPay}
+            onChange={(e) => setBabyPay(e.target.value)}
             required
           />
         </label>
