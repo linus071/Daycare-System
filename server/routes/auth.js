@@ -71,7 +71,7 @@ router.post('/check', async (req, res) => {
       const hoursWorked = (punchOut - shift.punchIn) / (1000 * 60 * 60); // Calculate hours worked
       shift.hoursWorked = hoursWorked;
 
-      // Check if hours worked exceed or fall below 7.5 hours
+      // Check if hours worked exceed or fall below 7.5 hour
       if (hoursWorked > 7.5) {
         shift.additionalTime = hoursWorked - 7.5;
         shift.atoReason = req.body.atoReason; // Reason for additional time
