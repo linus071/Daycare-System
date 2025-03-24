@@ -73,10 +73,17 @@ router.post('/check', async (req, res) => {
 
       // Check if hours worked exceed or fall below 7.5 hour
       if (hoursWorked > 7.5) {
+        if (!req.body.atoReason) {
+            return res.status(400).json({ message: 'ATO reason required for extra time' });
+        }
+    
+        // Format ATO reason as "YYYY-MM-DD: Reason"
+        const currentDate = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD
+        shift.atoReason = `${currentDate}: ${req.body.atoReason}`;
+    
         shift.additionalTime = hoursWorked - 7.5;
-        shift.atoReason = req.body.atoReason; // Reason for additional time
-        user.atoBalance += shift.additionalTime; // Update ATO balance
-      } else if (hoursWorked < 7.5) {
+        user.atoBalance += shift.additionalTime;
+    }else if (hoursWorked < 7.5) {
         shift.comments = req.body.comments; // Reason for reduced time
       }
 

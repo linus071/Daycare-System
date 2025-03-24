@@ -39,6 +39,14 @@ const CheckInOut = () => {
         setComments('');
       } else {
         setMessage(data.message || 'An error occurred');
+         // If the error is about ATO reason, force user input
+        if (data.message === 'ATO reason required for extra time') {
+          const userAtoReason = prompt("Your shift exceeded 7.5 hours. Enter an ATO reason:");
+          if (userAtoReason) {
+            setAtoReason(userAtoReason);
+            handleSubmit(e); // Retry submission with ATO reason
+          }
+      }
       }
     } catch (err) {
       setMessage('An error occurred. Please try again.');
