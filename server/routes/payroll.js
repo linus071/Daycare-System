@@ -112,8 +112,12 @@ router.post('/generate-excel-report', async (req, res) => {
         teacherData['Total Hours'] = totalHours;
         teacherData['ATO Balance'] = user.atoBalance;
         teacherData['Notes'] = shifts.map((shift) => shift.comments).join(', ');
+        teacherData['ATO Reasons'] = shifts
+        .map((shift) => shift.atoReason)        // get all atoReasons
+        .filter((reason) => reason?.trim())     // filter out empty or undefined ones
+        .join(', ');
         teacherData['Adjustments'] = ''; // Placeholder for manual adjustments
-  
+        
         payrollData.push(teacherData);
       }
   
