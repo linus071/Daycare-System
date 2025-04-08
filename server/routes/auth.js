@@ -68,7 +68,20 @@ router.post('/check', async (req, res) => {
 
       const punchOut = new Date();
       shift.punchOut = punchOut;
-      const hoursWorked = (punchOut - shift.punchIn) / (1000 * 60 * 60); // Calculate hours worked
+      const rawHours = (punchOut - shift.punchIn) / (1000 * 60 * 60); // Calculate hours worked
+      let hoursWorked = 0;
+
+      if (rawHours >= 0.5) {
+        const fullHours = Math.floor(rawHours);
+        const minutes = (rawHours - fullHours) * 60;
+
+        if (minutes < 30) {
+          hoursWorked = fullHours;
+        } else {
+          hoursWorked = fullHours + 0.5;
+        }
+      }
+
       shift.hoursWorked = hoursWorked;
 
       // Check if hours worked exceed or fall below 7.5 hour
