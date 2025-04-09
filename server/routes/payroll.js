@@ -20,7 +20,7 @@ router.get('/users/:userId', async (req, res) => {
 
 // Update user details
 router.put('/users/:userId', async (req, res) => {
-    const { hourlyRate, atoBalance, travelPay, closePay, babyPay } = req.body;
+    const { eceNumber, hourlyRate, atoBalance, travelPay, travelUnpay, sickPay, sickUnpay, closePay, babyPay } = req.body;
   
     try {
       const user = await User.findById(req.params.userId);
@@ -29,9 +29,13 @@ router.put('/users/:userId', async (req, res) => {
       }
   
       // Update user fields
+      user.eceNumber = eceNumber;
       user.hourlyRate = hourlyRate;
       user.atoBalance = atoBalance;
       user.travelPay = travelPay;
+      user.travelUnpay = travelUnpay;
+      user.sickPay = sickPay;
+      user.sickUnpay = sickUnpay;
       user.closePay = closePay;
       user.babyPay = babyPay;
   
@@ -65,8 +69,12 @@ router.post('/generate-excel-report', async (req, res) => {
   
         const teacherData = {
           Name: user.name,
+          'ECE Number': user.eceNumber,
           'Hourly Rate': user.hourlyRate,
-          Travel: user.travelPay || 0,
+          'Vacation Paid': user.travelPay || 0,
+          'Vacation Unpaid': user.travelUnpay || 0,
+          'Paid Sick': user.sickPay || 0,
+          'Unpaid Sick': user.sickUnpay || 0,
           Close: user.closePay || 0,
           Baby: user.babyPay || 0,
         };
@@ -90,8 +98,9 @@ router.post('/generate-excel-report', async (req, res) => {
           // Calculate total hours worked for the day
           const hoursWorked = shiftsForDay.reduce((sum, shift) => {
             if (shift.punchOut) {
-              const hours = (shift.punchOut - shift.punchIn) / (1000 * 60 * 60); // Convert to hours
-              return sum + hours;
+              const rawHours = (shift.punchOut - shift.punchIn) / (1000 * 60 * 60);
+              const rounded = roundWorkedHours(rawHours);
+              return sum + rounded;
             }
             return sum;
           }, 0);
@@ -162,5 +171,19 @@ function getBusinessDays(startDate, endDate) {
 
     return businessDays;
 }
+
+  function roundWorkedHours(rawHours) {
+    if (rawHours < 0.5) return 0;
+
+    const fullHours = Math.floor(rawHours);
+    const minutes = (rawHours - fullHours) * 60;
+
+    if (minutes < 30) {
+      return fullHours;
+    } else {
+      return fullHours + 0.5;
+    }
+  }
+
 
 module.exports = router;

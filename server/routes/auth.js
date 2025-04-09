@@ -14,8 +14,12 @@ router.get('/users', async (req, res) => {
 });
 
 // Add a new user (Admin only)
+// travelPay: { type: Number, default: 0 },
+// travelUnpay: { type: Number, default: 0 },
+// sickPay: { type: Number, default: 37.5 },
+// sickUnpay: { type: Number, default: 0 },
 router.post('/users', async (req, res) => {
-  const { name, password, hourlyRate, atoBalance, travelPay, closePay, babyPay } = req.body;
+  const { name, password, eceNumber, hourlyRate, atoBalance, travelPay, travelUnpay, sickPay, sickUnpay, closePay, babyPay } = req.body;
 
   try {
     // Check if the user already exists
@@ -28,9 +32,13 @@ router.post('/users', async (req, res) => {
     const user = new User({
       name,
       password,
+      eceNumber,
       hourlyRate,
       atoBalance,
       travelPay,
+      travelUnpay, 
+      sickPay, 
+      sickUnpay,
       closePay,
       babyPay,
     });
@@ -84,6 +92,8 @@ router.post('/check', async (req, res) => {
 
       shift.hoursWorked = hoursWorked;
 
+      const currentDate = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD
+
       // Check if hours worked exceed or fall below 7.5 hour
       if (hoursWorked > 7.5) {
         if (!req.body.atoReason) {
@@ -91,13 +101,22 @@ router.post('/check', async (req, res) => {
         }
     
         // Format ATO reason as "YYYY-MM-DD: Reason"
-        const currentDate = new Date().toISOString().split('T')[0]; // Get YYYY-MM-DD
         shift.atoReason = `${currentDate}: ${req.body.atoReason}`;
     
         shift.additionalTime = hoursWorked - 7.5;
         user.atoBalance += shift.additionalTime;
     }else if (hoursWorked < 7.5) {
-        shift.comments = req.body.comments; // Reason for reduced time
+      
+      if (req.body.atoReason) {
+        return res.status(400).json({ message: 'Did not exceed 7.5 hours' });
+      }
+
+        if (req.body.comments) {
+          const commentOut = `${currentDate} (OUT): ${req.body.comments}`;
+          shift.comments = shift.comments
+            ? `${shift.comments}\n${commentOut}`
+            : commentOut;
+        }
       }
 
       await shift.save();
@@ -113,7 +132,13 @@ router.post('/check', async (req, res) => {
       });
     } else {
       // User is checking in
-      const shift = new Shift({ userId: user._id, punchIn: new Date() });
+      const shift = new Shift({
+        userId: user._id,
+        punchIn: new Date(),
+        comments: req.body.comments
+          ? `${new Date().toISOString().split('T')[0]} (IN): ${req.body.comments}`
+          : '',
+      });
       await shift.save();
 
       user.shifts.push(shift._id);

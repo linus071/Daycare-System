@@ -3,9 +3,13 @@ import React, { useState, useEffect } from 'react';
 const UpdateAtoBalance = () => {
   const [users, setUsers] = useState([]); // List of all users
   const [selectedUser, setSelectedUser] = useState(null); // Selected user details
+  const [eceNumber, setEceNumber] = useState(0); // ECE Number
   const [hourlyRate, setHourlyRate] = useState(0); // Hourly rate
   const [atoBalance, setAtoBalance] = useState(0); // ATO balance
   const [travelPay, setTravelPay] = useState(0); // Travel pay
+  const [travelUnpay, setTravelUnpay] = useState(0); // New field
+  const [sickPay, setSickPay] = useState(0); // New field
+  const [sickUnpay, setSickUnpay] = useState(0); // New field
   const [closePay, setClosePay] = useState(0); // Close pay
   const [babyPay, setBabyPay] = useState(0); // Baby pay
   const [shifts, setShifts] = useState([]); // Shifts for the selected user
@@ -28,9 +32,13 @@ const UpdateAtoBalance = () => {
       const userResponse = await fetch(`http://localhost:5000/api/users/${userId}`);
       const userData = await userResponse.json();
       setSelectedUser(userData);
+      setEceNumber(userData.eceNumber);
       setHourlyRate(userData.hourlyRate);
       setAtoBalance(userData.atoBalance);
       setTravelPay(userData.travelPay);
+      setTravelUnpay(userData.travelUnpay);
+      setSickPay(userData.sickPay);
+      setSickUnpay(userData.sickUnpay);
       setClosePay(userData.closePay);
       setBabyPay(userData.babyPay);
 
@@ -51,9 +59,13 @@ const UpdateAtoBalance = () => {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          eceNumber: Number(eceNumber),
           hourlyRate: Number(hourlyRate),
           atoBalance: Number(atoBalance),
           travelPay: Number(travelPay),
+          travelUnpay: Number(travelUnpay),
+          sickPay: Number(sickPay),
+          sickUnpay: Number(sickUnpay),
           closePay: Number(closePay),
           babyPay: Number(babyPay),
         }),
@@ -90,6 +102,16 @@ const UpdateAtoBalance = () => {
         <div>
           <h3>Update Details for {selectedUser.name}</h3>
           <form onSubmit={handleSubmit}>
+          <label>
+              ECE Number:
+              <input
+                type="number"
+                value={eceNumber}
+                onChange={(e) => setEceNumber(e.target.value)}
+                required
+              />
+            </label>
+            <br />
             <label>
               Hourly Rate:
               <input
@@ -111,11 +133,41 @@ const UpdateAtoBalance = () => {
             </label>
             <br />
             <label>
-              Travel Pay:
+              Vacation Paid:
               <input
                 type="number"
                 value={travelPay}
                 onChange={(e) => setTravelPay(e.target.value)}
+                required
+              />
+            </label>
+            <br />
+            <label>
+              Vacation Unpaid:
+              <input
+                type="number"
+                value={travelUnpay}
+                onChange={(e) => setTravelUnpay(e.target.value)}
+                required
+              />
+            </label>
+            <br />
+            <label>
+              Paid Sick:
+              <input
+                type="number"
+                value={sickPay}
+                onChange={(e) => setSickPay(e.target.value)}
+                required
+              />
+            </label>
+            <br />
+            <label>
+              Unpaid Sick:
+              <input
+                type="number"
+                value={sickUnpay}
+                onChange={(e) => setSickUnpay(e.target.value)}
                 required
               />
             </label>

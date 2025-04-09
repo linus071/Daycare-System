@@ -70,9 +70,13 @@ const Admin = ({ onBack }) => {
 const AddUser = () => {
   const [name, setName] = useState('');
   const [userPassword, setUserPassword] = useState('');
+  const [eceNumber, setEceNumber] = useState(0);
   const [hourlyRate, setHourlyRate] = useState(0); // New field
   const [atoBalance, setAtoBalance] = useState(0); // New field
   const [travelPay, setTravelPay] = useState(0); // New field
+  const [travelUnpay, setTravelUnpay] = useState(0); // New field
+  const [sickPay, setSickPay] = useState(37.5); // New field
+  const [sickUnpay, setSickUnpay] = useState(0); // New field
   const [closePay, setClosePay] = useState(0); // New field
   const [babyPay, setBabyPay] = useState(0); // New field
   const [message, setMessage] = useState('');
@@ -86,9 +90,13 @@ const AddUser = () => {
         body: JSON.stringify({
           name,
           password: userPassword,
+          eceNumber: Number(eceNumber),
           hourlyRate: Number(hourlyRate), // Convert to number
           atoBalance: Number(atoBalance),
           travelPay: Number(travelPay),
+          travelUnpay: Number(travelUnpay),
+          sickPay: Number(sickPay),
+          sickUnpay: Number(sickUnpay),
           closePay: Number(closePay),
           babyPay: Number(babyPay),
         }),
@@ -98,9 +106,13 @@ const AddUser = () => {
         setMessage(data.message);
         setName('');
         setUserPassword('');
+        setEceNumber(0);
         setHourlyRate(0);
         setAtoBalance(0);
         setTravelPay(0);
+        setTravelUnpay(0);
+        setSickPay(0);
+        setSickUnpay(0);
         setClosePay(0);
         setBabyPay(0);
       } else {
@@ -136,6 +148,16 @@ const AddUser = () => {
         </label>
         <br />
         <label>
+          ECE Number:
+          <input
+            type="number"
+            value={eceNumber}
+            onChange={(e) => setEceNumber(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
           Hourly Rate:
           <input
             type="number"
@@ -156,11 +178,41 @@ const AddUser = () => {
         </label>
         <br />
         <label>
-          Travel Pay:
+          Vacation Paid:
           <input
             type="number"
             value={travelPay}
             onChange={(e) => setTravelPay(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          Vacation Unpaid:
+          <input
+            type="number"
+            value={travelUnpay}
+            onChange={(e) => setTravelUnpay(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          Paid Sick:
+          <input
+            type="number"
+            value={sickPay}
+            onChange={(e) => setSickPay(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <label>
+          Unpaid Sick:
+          <input
+            type="number"
+            value={sickUnpay}
+            onChange={(e) => setSickUnpay(e.target.value)}
             required
           />
         </label>
